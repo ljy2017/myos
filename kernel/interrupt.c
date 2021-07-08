@@ -1,9 +1,13 @@
 #include "interrupt.h"
 #include "stdint.h"
 #include "global.h"
+#include "io.h"
 
 #define IDT_DESC_CNT 0x21
-
+#define PIC_M_CTRL 0x20
+#define PIC_M_DATA 0x21
+#define PIC_S_CTRL 0xa0
+#define PIC_S_DATA 0xa1
 //中断门描述符结构体
 struct gate_desc{
     uint16_t func_offset_low_word;//偏移地址低16位
@@ -35,6 +39,25 @@ static void idt_desc_init(){
     put_str("  idt_desc_init done\n");
 }
 
+static void pic_init(){
+    outb(PIC_M_CTRL,0x11);//设置ICW1，边沿触发，级联8259，需要icw4
+    outb(PIC_M_DATA,0x20);//ICW2:起始中断向量号为0x20
+    outb(PIC_M_DATA,0x04);//ICW3:IR2接从片
+    outb(PIC_M_DATA,0x01);//ICW4:8086模式，正常EOI
+
+    //初始化从片
+    outb(PIC_S_CTRL,0x11);//ICW1,边沿触发，级联8259，需要ICW4
+    outb(PIC_S_DATA,0x28);//ICW2：起始中断向量号为0x28
+    outb(PIC_S_DATA,0x02);//设置从片连接到主片的IR2引脚
+    outb(PIC_S_DATA,0x01);//ICW4：8086模式，正常EOI
+
+    //打开主片上的IR0，只接受时钟中断
+    outb(PIC_M_DATA,0xfe);
+    outb(PIC_S_DATA,0xff);
+
+    put_str("pic_INIT done\n");
+}
+
 void idt_init(){
     put_str("idt_init start\n");
     idt_desc_init();
@@ -45,3 +68,4 @@ void idt_init(){
     asm volatile("lidt %0"::"m"(idt_operand));
     put_str("idt_init done\n");
 }
+
