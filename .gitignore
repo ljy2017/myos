@@ -11,7 +11,11 @@
 *.ilk
 *.map
 *.exp
+<<<<<<< HEAD
 
+=======
+*.bin
+>>>>>>> e31625f (2021-7-8 interrupt 80%)
 # Precompiled Headers
 *.gch
 *.pch
