@@ -3,6 +3,7 @@
 %define ZERO push 0
 
 extern put_str
+extern idt_table
 
 section .data
     intr_str db "interrupt occur!",0xa,0
@@ -13,20 +14,36 @@ section .data
 section .text
 intr%1entry:
     %2
-    push intr_str
-    call put_str
-    add esp,4
+    push ds
+    push es
+    push gs
+    push fs
+    pushad
 
     ;往从片和主片上发送EOI
     mov al,0x20
     out 0xa0,al;从片
     out 0x20,al;主片
 
-    add esp,4;忽略错误码error_code
-    iret;从中断中返回
+    push %1
+    call [idt_table+%1*4]
+    jmp intr_exit;重复的代码，没必要卸载macro里
+
+    
 section .data
     dd  intr%1entry
 %endmacro
+section .text
+global intr_exit
+intr_exit:
+    add esp,4
+    popad
+    pop fs
+    pop gs
+    pop es
+    pop ds
+    add esp,4;忽略错误码error_code
+    iret;从中断中返回
 
 VECTOR 0x00,ZERO
 VECTOR 0x01,ZERO
