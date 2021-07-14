@@ -2,14 +2,18 @@
 .PHONY: all clean hd
 
 CC=gcc
-CFLAG=-m32 -I include  -c
+CFLAG=-m32 -I include  -c -fno-builtin
 ASFLAGS=-f elf
 BUILD_DIR=build
 AS=nasm
 LD=ld
 LFLAG=-m elf_i386 -Ttext 0xc0001500 -e main
 
-OBJECT= ${BUILD_DIR}/main.o ${BUILD_DIR}/init.o ${BUILD_DIR}/interrupt.o  ${BUILD_DIR}/print.o ${BUILD_DIR}/kernel.o ${BUILD_DIR}/timer.o
+OBJECT= ${BUILD_DIR}/main.o ${BUILD_DIR}/init.o ${BUILD_DIR}/interrupt.o  \
+	${BUILD_DIR}/print.o ${BUILD_DIR}/kernel.o ${BUILD_DIR}/timer.o \
+	${BUILD_DIR}/memory.o ${BUILD_DIR}/string.o ${BUILD_DIR}/bitmap.o \
+	${BUILD_DIR}/debug.o
+
 
 ${BUILD_DIR}/timer.o: device/timer.c include/print.h include/io.h include/timer.h
 	${CC} ${CFLAG} -o $@ $<
@@ -23,12 +27,23 @@ ${BUILD_DIR}/interrupt.o: kernel/interrupt.c include/interrupt.h include/stdint.
 ${BUILD_DIR}/main.o: kernel/main.c include/print.h include/init.h
 	${CC} ${CFLAG} -o $@ $<
 
+${BUILD_DIR}/memory.o: kernel/memory.c include/memory.h include/stdint.h include/print.h
+	${CC} ${CFLAG} -o $@ $<
+
+${BUILD_DIR}/string.o: kernel/string.c include/string.h include/global.h include/debug.h
+	${CC} ${CFLAG} -o $@ $<
+
+${BUILD_DIR}/bitmap.o: kernel/bitmap.c include/bitmap.h include/stdint.h include/string.h include/print.h include/interrupt.h include/debug.h
+	${CC} ${CFLAG} -o $@ $<
+
+${BUILD_DIR}/debug.o: kernel/debug.c include/debug.h include/print.h include/interrupt.h
+	${CC} ${CFLAG} -o $@ $<
+
 ${BUILD_DIR}/kernel.o: kernel/kernel.S
 	${AS} ${ASFLAGS} -o $@ $<
 
 ${BUILD_DIR}/print.o: lib/kernel/print.S
 	${AS} ${ASFLAGS} -o $@ $<
-
 
 
 bin/kernel.bin:${OBJECT}
