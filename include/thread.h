@@ -74,4 +74,6 @@ struct task_struct* thread_start(char* name,int prio,thread_func* function,void*
 void schedule();
 void thread_init();
 struct task_struct* running_thread();
+void thread_unblock(struct task_struct* pthread);
+void thread_block(enum task_status status);
 #endif

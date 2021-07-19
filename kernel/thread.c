@@ -116,3 +116,23 @@ void schedule(){
     next_task->status=TASK_RUNNING;
     switch_to(cur_task,next_task);
 }
+
+void thread_block(enum task_status status){
+    enum intr_status old_status=intr_disable();
+    ASSERT(status==TASK_WAITING||status==TASK_HANGING||status==TASK_BLOCK)
+    struct task_struct* cur_task=running_thread();
+    cur_task->status=status;
+    schedule();
+    intr_set_status(status);
+}
+
+void thread_unblock(struct task_struct* pthread){
+    enum intr_status old_status=intr_disable();
+    ASSERT(pthread->status==TASK_BLOCK||pthread->status==TASK_HANGING||pthread->status==TASK_READY);
+    if(pthread->status!=TASK_READY){
+        ASSERT(!elem_find(&ready_list,&pthread->list_tag));
+        list_push(&ready_list,&pthread->list_tag);
+        pthread->status=TASK_READY;
+    }
+    intr_set_status(old_status);
+}
