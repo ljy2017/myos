@@ -91,7 +91,7 @@ uint32_t* pde_ptr(uint32_t vaddr){
 }
 
 static void* palloc(struct pool* m_pool){
-    put_str("ni hao 1\n");
+
     int bit_idx=bitmap_scan(&(m_pool->pool_bitmap),1);
     if(bit_idx==-1)return NULL;
     bitmap_set(&(m_pool->pool_bitmap),bit_idx,1);
@@ -101,14 +101,14 @@ static void* palloc(struct pool* m_pool){
 }
 
 static void vir_to_real(void* _vaddr,void* _page_phyaddr){
-    put_str("hello world 1\n");
+
     uint32_t vaddr=(uint32_t)_vaddr;
     uint32_t page_phyaddr=(uint32_t)_page_phyaddr;
-    put_str("hello world 2\n");
+
     uint32_t* pde=pde_ptr(vaddr);
-    put_str("hello world 3\n");
+
     uint32_t* pte=pte_ptr(vaddr);
-    put_str("hello world 4\n");
+
     if(!(*pde&0x00000001)){//pde不存在
         put_str("hello world 5\n");
         uint32_t pde_phyaddr=(uint32_t)palloc(&kernel_pool);
@@ -117,9 +117,9 @@ static void vir_to_real(void* _vaddr,void* _page_phyaddr){
         *pte=(page_phyaddr|PG_US_U|PG_RW_W|PG_P_1);
         
     }else{//pde存在
-        put_str("hello world 6\n");
+
         *pte=(page_phyaddr|PG_US_U|PG_RW_W|PG_P_1);
-        put_str("hello world 7\n");
+
     }
 }
 

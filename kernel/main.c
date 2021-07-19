@@ -2,14 +2,43 @@
 #include "init.h"
 #include "debug.h"
 #include "memory.h"
+#include "thread.h"
+#include "interrupt.h"
+
+void print(void* str);
+void k_thread_a(void*);
+void k_thread_b(void*);
 int main(void) {
    put_str("I am kernel\n");
    init_all();
-   asm volatile("cli");
-   void* addr=get_kernel_page(3);
-   put_str("\n get_kernel_page start vaddr is ");
-   put_int((uint32_t)addr);
-   put_str("\n");
-   while(1);
+   thread_start("k_thread_a",31,k_thread_a,"argA ");
+   thread_start("k_thread_b",8,k_thread_b,"argB ");
+   intr_enable();
+   put_str("end\n");
+   while(1){
+      intr_disable();
+      put_str("MAIN ");
+      intr_enable();
+   }
    return 0;
+}
+
+void k_thread_a(void* str){
+   char* arg=str;
+   
+   while(1){
+      intr_disable();
+      put_str(arg);
+      intr_enable();
+   }
+}
+
+void k_thread_b(void* str){
+   char* arg=str;
+   
+   while(1){
+      intr_disable();
+      put_str(arg);
+      intr_enable();
+   }
 }

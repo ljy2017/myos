@@ -2,6 +2,7 @@
 #include "stdint.h"
 #include "global.h"
 #include "io.h"
+#include "print.h"
 
 #define IDT_DESC_CNT 0x21
 #define PIC_M_CTRL 0x20
@@ -24,18 +25,33 @@ static void make_idt_desc(struct gate_desc* p_gdesc,uint8_t attr,intr_handler fu
 static struct gate_desc idt[IDT_DESC_CNT];//中断描述符表
 
 extern intr_handler intr_entry_table[IDT_DESC_CNT];
+extern void set_cursor(uint16_t num);
 
-intr_handler idt_table[IDT_DESC_CNT];
 
-char* intr_name[IDT_DESC_CNT];
 
 static void general_intr_handler(uint8_t vec_nr){
     if(vec_nr==0x27||vec_nr==0x2f){
         return;
     }
-    // put_str("int vector: 0x");
-    // put_int(vec_nr);
-    // put_char('\n');
+    set_cursor(0);
+    int cursor_pos=0;
+    while(cursor_pos<320){
+        put_char(' ');
+        cursor_pos++;
+    }
+    set_cursor(0);
+
+    put_str("!!!!!    exception message begin !!!!!!!\n");
+    set_cursor(88);
+    put_str(intr_name[vec_nr]);
+    if(vec_nr==14){
+        int page_fault_vaddr=0;
+        asm volatile("movl %%cr2,%0":"=r"(page_fault_vaddr));
+        put_str("\npage fault addr is  ");
+        put_int(page_fault_vaddr);
+    }
+    put_str("\n!!!!!!!   exception message end  !!!!!!!");
+    while(1);
 }
 
 static void exception_init(void){
@@ -147,4 +163,8 @@ enum intr_status intr_get_status(){
 
 enum intr_status intr_set_status(enum intr_status new_status){
     return new_status==INTR_ON?intr_enable():intr_disable();
+}
+
+void register_handler(uint8_t vector_no,intr_handler function){
+    idt_table[vector_no]=function;
 }

@@ -16,8 +16,8 @@ intr%1entry:
     %2
     push ds
     push es
-    push gs
     push fs
+    push gs
     pushad
 
     ;往从片和主片上发送EOI
@@ -27,7 +27,7 @@ intr%1entry:
 
     push %1
     call [idt_table+%1*4]
-    jmp intr_exit;重复的代码，没必要卸载macro里
+    jmp intr_exit;重复的代码，没必要写在macro里
 
     
 section .data
@@ -38,8 +38,8 @@ global intr_exit
 intr_exit:
     add esp,4
     popad
-    pop fs
     pop gs
+    pop fs
     pop es
     pop ds
     add esp,4;忽略错误码error_code
