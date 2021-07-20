@@ -17,10 +17,9 @@ void lock_init(struct lock* lock){
 
 void seamphore_down(struct seamphore* seam){
     enum intr_status old_status=intr_disable();
-    struct task_struct* cur_task=running_thread();
     while(seam->value==0){
-        ASSERT(!elem_find(&seam->waiter,&cur_task->list_tag));
-        list_append(&seam->waiter,&cur_task->list_tag);
+        ASSERT(!elem_find(&seam->waiter,&running_thread()->list_tag));
+        list_append(&seam->waiter,&running_thread()->list_tag);
         thread_block(TASK_BLOCK);
     }
     seam->value--;
@@ -30,7 +29,7 @@ void seamphore_down(struct seamphore* seam){
 
 void seamphore_up(struct seamphore* seam){
     enum intr_status old_status=intr_disable();
-    struct task_struct* cur_task=running_thread();
+    ASSERT(seam->value==0);
     if(!list_empty(&seam->waiter)){
         struct task_struct* thread_blocked=elem2entry(struct task_struct,list_tag,list_pop(&seam->waiter));
         thread_unblock(thread_blocked);
@@ -39,3 +38,26 @@ void seamphore_up(struct seamphore* seam){
     intr_set_status(old_status);
 }
 
+void lock_acquire(struct lock* plock){
+    if(running_thread()==plock->holder){
+        plock->count++;
+    }else{
+        seamphore_down(&plock->seam);
+        plock->holder= running_thread();
+        plock->count=1;
+    }
+}
+
+void lock_release(struct lock* plock){
+
+    ASSERT(plock->holder==running_thread());
+
+    if(plock->count>1){
+        plock->count--;
+        return;
+    }
+
+    plock->holder=NULL;
+    plock->count=0;
+    seamphore_up(&plock->seam);
+}

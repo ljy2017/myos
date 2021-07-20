@@ -13,7 +13,7 @@ OBJECT= ${BUILD_DIR}/main.o ${BUILD_DIR}/init.o ${BUILD_DIR}/interrupt.o  \
 	${BUILD_DIR}/print.o ${BUILD_DIR}/kernel.o ${BUILD_DIR}/timer.o \
 	${BUILD_DIR}/memory.o ${BUILD_DIR}/string.o ${BUILD_DIR}/bitmap.o \
 	${BUILD_DIR}/debug.o ${BUILD_DIR}/thread.o ${BUILD_DIR}/lib/list.o \
-	${BUILD_DIR}/switch.o
+	${BUILD_DIR}/switch.o ${BUILD_DIR}/sync.o ${BUILD_DIR}/console.o
 
 
 ${BUILD_DIR}/timer.o: device/timer.c include/print.h include/io.h include/timer.h
@@ -44,6 +44,14 @@ ${BUILD_DIR}/thread.o: kernel/thread.c include/thread.h include/stdint.h include
 	${CC} ${CFLAG} -o $@ $<
 
 ${BUILD_DIR}/lib/list.o: lib/kernel/list.c include/stdint.h include/interrupt.h include/global.h  lib/include/list.h
+	${CC} ${CFLAG} -o $@ $<
+
+
+${BUILD_DIR}/sync.o: kernel/sync.c include/sync.h include/stdint.h include/interrupt.h include/debug.h include/thread.h lib/include/list.h
+	${CC} ${CFLAG} -o $@ $<
+
+
+${BUILD_DIR}/console.o: device/console.c include/stdint.h include/sync.h include/thread.h include/console.h
 	${CC} ${CFLAG} -o $@ $<
 
 ${BUILD_DIR}/kernel.o: kernel/kernel.S

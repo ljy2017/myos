@@ -18,4 +18,6 @@ void seamphore_init(struct seamphore* seam,uint8_t value);
 void lock_init(struct lock* lock);
 void seamphore_down(struct seamphore* seam);
 void seamphore_up(struct seamphore* seam);
+void lock_acquire(struct lock* plock);
+void lock_release(struct lock* plock);
 #endif

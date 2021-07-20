@@ -14,12 +14,15 @@ int main(void) {
    thread_start("k_thread_a",31,k_thread_a,"argA ");
    thread_start("k_thread_b",8,k_thread_b,"argB ");
    intr_enable();
-   put_str("end\n");
    while(1){
-      intr_disable();
-      put_str("MAIN ");
-      intr_enable();
+      console_put_str("MAIN ");
    }
+
+   // while(1){
+   //    intr_disable();
+   //    put_str("MAIN ");
+   //    intr_enable();
+   // }
    return 0;
 }
 
@@ -27,18 +30,26 @@ void k_thread_a(void* str){
    char* arg=str;
    
    while(1){
-      intr_disable();
-      put_str(arg);
-      intr_enable();
+      console_put_str(arg);
    }
+
+   // while(1){
+   //    intr_disable();
+   //    put_str(arg);
+   //    intr_enable();
+   // }
 }
 
 void k_thread_b(void* str){
    char* arg=str;
    
    while(1){
-      intr_disable();
-      put_str(arg);
-      intr_enable();
+      console_put_str(arg);
    }
+
+   // while(1){
+   //    intr_disable();
+   //    put_str(arg);
+   //    intr_enable();
+   // }
 }

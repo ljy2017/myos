@@ -72,7 +72,7 @@ void thread_init(){
 
 
 
-struct task_struct* thread_start(char* name,int prio,thread_func* function,void* func_arg){
+struct task_struct* thread_start(char* name,int prio,thread_func function,void* func_arg){
     // put_str("hello 1\n");
     struct task_struct *pthread=get_kernel_page(1);
     init_thread(pthread,prio,name);
@@ -123,7 +123,7 @@ void thread_block(enum task_status status){
     struct task_struct* cur_task=running_thread();
     cur_task->status=status;
     schedule();
-    intr_set_status(status);
+    intr_set_status(old_status);
 }
 
 void thread_unblock(struct task_struct* pthread){

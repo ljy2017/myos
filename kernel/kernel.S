@@ -6,7 +6,6 @@ extern put_str
 extern idt_table
 
 section .data
-    intr_str db "interrupt occur!",0xa,0
     global intr_entry_table
     intr_entry_table:
 
@@ -43,7 +42,7 @@ intr_exit:
     pop es
     pop ds
     add esp,4;忽略错误码error_code
-    iret;从中断中返回
+    iretd;从中断中返回
 
 VECTOR 0x00,ZERO
 VECTOR 0x01,ZERO
