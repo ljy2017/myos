@@ -1,8 +1,12 @@
 #ifndef INTERRUPT
 #define INTERRUPT
 #include "stdint.h"
+#define IDT_DESC_CNT 0x30
+#define PIC_M_CTRL 0x20
+#define PIC_M_DATA 0x21
+#define PIC_S_CTRL 0xa0
+#define PIC_S_DATA 0xa1
 typedef void* intr_handler;
-#define IDT_DESC_CNT 0x21
 enum intr_status{
     INTR_OFF,//中断关闭
     INTR_ON//中断打开

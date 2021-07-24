@@ -4,7 +4,7 @@
 #include "io.h"
 #include "print.h"
 
-#define IDT_DESC_CNT 0x21
+#define IDT_DESC_CNT 0x30
 #define PIC_M_CTRL 0x20
 #define PIC_M_DATA 0x21
 #define PIC_S_CTRL 0xa0
@@ -112,7 +112,7 @@ static void pic_init(void){
     outb(PIC_S_DATA,0x01);//ICW4：8086模式，正常EOI
 
     //打开主片上的IR0，只接受时钟中断
-    outb(PIC_M_DATA,0xfe);
+    outb(PIC_M_DATA,0xfc);
     outb(PIC_S_DATA,0xff);
 
     put_str("pic_INIT done\n");

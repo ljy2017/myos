@@ -13,7 +13,8 @@ OBJECT= ${BUILD_DIR}/main.o ${BUILD_DIR}/init.o ${BUILD_DIR}/interrupt.o  \
 	${BUILD_DIR}/print.o ${BUILD_DIR}/kernel.o ${BUILD_DIR}/timer.o \
 	${BUILD_DIR}/memory.o ${BUILD_DIR}/string.o ${BUILD_DIR}/bitmap.o \
 	${BUILD_DIR}/debug.o ${BUILD_DIR}/thread.o ${BUILD_DIR}/lib/list.o \
-	${BUILD_DIR}/switch.o ${BUILD_DIR}/sync.o ${BUILD_DIR}/console.o
+	${BUILD_DIR}/switch.o ${BUILD_DIR}/sync.o ${BUILD_DIR}/console.o \
+	${BUILD_DIR}/keyboard.o ${BUILD_DIR}/ioqueue.o
 
 
 ${BUILD_DIR}/timer.o: device/timer.c include/print.h include/io.h include/timer.h
@@ -52,6 +53,12 @@ ${BUILD_DIR}/sync.o: kernel/sync.c include/sync.h include/stdint.h include/inter
 
 
 ${BUILD_DIR}/console.o: device/console.c include/stdint.h include/sync.h include/thread.h include/console.h
+	${CC} ${CFLAG} -o $@ $<
+
+${BUILD_DIR}/keyboard.o: device/keyboard.c  include/keyboard.h include/print.h include/interrupt.h include/io.h include/global.h
+	${CC} ${CFLAG} -o $@ $<
+
+${BUILD_DIR}/ioqueue.o: device/ioqueue.c include/stdint.h include/debug.h include/thread.h include/sync.h include/interrupt.h include/ioqueue.h
 	${CC} ${CFLAG} -o $@ $<
 
 ${BUILD_DIR}/kernel.o: kernel/kernel.S
